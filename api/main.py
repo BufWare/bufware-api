@@ -1,8 +1,9 @@
-from api.database import SessionLocal
-
 from fastapi import FastAPI
 
+from api.database import SessionLocal
+
 app = FastAPI()
+
 
 def get_db():
     try:
@@ -10,6 +11,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 @app.get("/")
 def get_home():
