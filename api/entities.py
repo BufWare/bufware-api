@@ -23,12 +23,10 @@ obsah_objednavky = sa.Table(
 class ObjednavkaORM(Base):
     __tablename__ = "objednavka"
     id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
-    timestamp = ...
+    timestamp = sa.Column("timestamp", sa.TIMESTAMP)
     stav = sa.Column("stav", sa.Enum(Stav))
     cena = sa.Column("cena", sa.Float)
-    produkty = relationship(
-        "ProduktORM", secondary=obsah_objednavky, backref="produkty"
-    )
+    produkty = relationship("ProduktORM", secondary=obsah_objednavky)
 
 
 class ProduktORM(Base):
@@ -37,14 +35,20 @@ class ProduktORM(Base):
     nazev = sa.Column("nazev", sa.String)
     cena = sa.Column("cena", sa.Float)
     skryty = sa.Column("skryty", sa.Boolean, default=False)
-    kategorie = relationship("KategorieORM", secondary=kategorie_produkt)
+    kategorie = relationship(
+        "KategorieORM", secondary=kategorie_produkt, back_populates="produkty"
+    )
 
 
 class KategorieORM(Base):
     __tablename__ = "kategorie"
     id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
     nazev = sa.Column("nazev", sa.String)
-    produkty = relationship("ProduktORM", secondary=kategorie_produkt)
+    produkty = relationship(
+        "ProduktORM", secondary=kategorie_produkt, back_populates="kategorie"
+    )
 
 
-Base.metadata.create_all(engine)
+# TESTING ONLY
+Base.metadata.drop_all(engine, checkfirst=False)
+Base.metadata.create_all(engine, checkfirst=False)
