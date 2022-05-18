@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
 from api.database import Base
+from api.models import Stav
 
 kategorie_produkt = sa.Table(
     "kategorie_produkt",
@@ -9,6 +10,23 @@ kategorie_produkt = sa.Table(
     sa.Column("produkt_id", sa.ForeignKey("produkt.id")),
     sa.Column("kategorie_id", sa.ForeignKey("kategorie.id")),
 )
+
+obsah_objednavky = sa.Table(
+    "obsah_objednavky",
+    Base.metadata,
+    sa.Column("objednavka_id", sa.ForeignKey("objednavka.id")),
+    sa.Column("produkt_id", sa.ForeignKey("produkt.id")),
+    sa.Column("cena", sa.Float),
+)
+
+
+class ObjednavkaORM(Base):
+    __tablename__ = "objednavka"
+    id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
+    timestamp = ...
+    stav = sa.Column("stav", sa.Enum(Stav))
+    cena = sa.Column("cena", sa.Float)
+    produkty = relationship("ProduktORM", secondary=obsah_objednavky)
 
 
 class ProduktORM(Base):
