@@ -10,29 +10,38 @@ class Stav(Enum):
     ZRUSENO = 3
 
 
-class Objednavka(BaseModel):
-    class Config:
-        orm_mode = True
-
-    id: int
+class ObjednavkaBase(BaseModel):
     cena: float
     timestamp: int
     stav: Stav
 
 
-class Produkt(BaseModel):
+class ObjednavkaDB(ObjednavkaBase):
     class Config:
         orm_mode = True
 
     id: int
+
+
+class ProduktBase(BaseModel):
     nazev: str
     cena: float
     skryty: bool
 
 
-class Kategorie(BaseModel):
+class ProduktDB(ProduktBase):
     class Config:
         orm_mode = True
 
     id: int
+
+
+class KategorieBase(BaseModel):
     nazev: str
+
+
+class KategorieDB(KategorieBase):
+    class Config:
+        orm_mode = True
+
+    id: int
