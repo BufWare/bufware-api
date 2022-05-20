@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
-from api.database import Base, engine
+from api.database import Base
 from api.models import Stav
 
 kategorie_produkt = sa.Table(
@@ -47,8 +47,3 @@ class KategorieORM(Base):
     produkty = relationship(
         "ProduktORM", secondary=kategorie_produkt, back_populates="kategorie"
     )
-
-
-# TESTING ONLY
-#Base.metadata.drop_all(engine)
-#Base.metadata.create_all(engine)
