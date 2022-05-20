@@ -50,5 +50,5 @@ class KategorieORM(Base):
 
 
 # TESTING ONLY
-Base.metadata.drop_all(engine, checkfirst=False)
-Base.metadata.create_all(engine, checkfirst=False)
+#Base.metadata.drop_all(engine)
+#Base.metadata.create_all(engine)
