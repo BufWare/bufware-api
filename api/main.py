@@ -1,9 +1,8 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
+from api import entities
 from api.database import SessionLocal
-from api.entities import (KategorieORM, ObjednavkaORM, ObsahObjednavky,
-                          ProduktORM)
 from api.models import ObjednavkaData, ObjednavkaDB, ProduktData, ProduktDB
 
 app = FastAPI()
@@ -24,7 +23,7 @@ def get_home():
 
 @app.get("/overview")
 def overview(session: Session = Depends(get_db)):
-    orders = session.query(ObjednavkaORM).all()
+    orders = session.query(entities.ObjednavkaORM).all()
     return orders
 
 
@@ -33,11 +32,11 @@ def create_product(prod_data: ProduktData, session: Session = Depends(get_db)):
 
     categories = []
     for kategorie in prod_data.kategorie:
-        category = session.query(KategorieORM).get(kategorie)
+        category = session.query(entities.KategorieORM).get(kategorie)
         if category is not None:
             categories.append(category)
 
-    product = ProduktORM(
+    product = entities.ProduktORM(
         nazev=prod_data.nazev,
         cena=prod_data.cena,
     )
@@ -54,7 +53,7 @@ def create_order(obj_data: ObjednavkaData, session: Session = Depends(get_db)):
     cena = 0
     produkty = []
     for produkt in obj_data.data:
-        produkt_db = session.query(ProduktORM).get(produkt.id)
+        produkt_db = session.query(entities.ProduktORM).get(produkt.id)
 
         if produkt_db is None:
             return {"error": "Neznámý produkt"}
@@ -62,11 +61,11 @@ def create_order(obj_data: ObjednavkaData, session: Session = Depends(get_db)):
         produkty.append((produkt_db, produkt.pocet))
         cena += produkt_db.cena * produkt.pocet
 
-    objednavka = ObjednavkaORM(cena=cena)
+    objednavka = entities.ObjednavkaORM(cena=cena)
     session.add(objednavka)
     session.commit()
     for produkt, pocet in produkty:
-        obsah = ObsahObjednavky(
+        obsah = entities.ObsahObjednavky(
             objednavka_id=objednavka.id, produkt_id=produkt.id, pocet=pocet
         )
         session.add(obsah)
