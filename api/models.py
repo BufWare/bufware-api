@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from pydantic import BaseModel
 
@@ -21,6 +22,15 @@ class ObjednavkaDB(ObjednavkaBase):
         orm_mode = True
 
     id: int
+
+
+class ProduktObsah(BaseModel):
+    id: int
+    pocet: int
+
+
+class ObjednavkaData(BaseModel):
+    produkty: List[ProduktObsah]
 
 
 class ProduktBase(BaseModel):
