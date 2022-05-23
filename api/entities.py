@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
@@ -23,8 +25,8 @@ obsah_objednavky = sa.Table(
 class ObjednavkaORM(Base):
     __tablename__ = "objednavka"
     id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
-    timestamp = sa.Column("timestamp", sa.TIMESTAMP)
-    stav = sa.Column("stav", sa.Enum(Stav))
+    timestamp = sa.Column("timestamp", sa.TIMESTAMP, default=datetime.now())
+    stav = sa.Column("stav", sa.Enum(Stav), default=Stav.OBJEDNANO)
     cena = sa.Column("cena", sa.Float)
     produkty = relationship("ProduktORM", secondary=obsah_objednavky)
 
