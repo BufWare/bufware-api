@@ -1,9 +1,10 @@
-from fastapi import Depends, FastAPI, Response, status
+from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
 from api.database import SessionLocal
-from api.entities import ObjednavkaORM, ProduktORM
-from api.models import ObjednavkaData
+from api.entities import (KategorieORM, ObjednavkaORM, ObsahObjednavky,
+                          ProduktORM)
+from api.models import ObjednavkaData, ObjednavkaDB, ProduktData, ProduktDB
 
 app = FastAPI()
 
@@ -18,7 +19,7 @@ def get_db():
 
 @app.get("/")
 def get_home():
-    return {"message": "It works"}
+    return {"message": "Funguju!"}
 
 
 @app.get("/overview")
@@ -27,25 +28,48 @@ def overview(session: Session = Depends(get_db)):
     return orders
 
 
-@app.post("/order")
-def create_order(
-    data: ObjednavkaData, res: Response, session: Session = Depends(get_db)
-):
+@app.post("/product")
+def create_product(prod_data: ProduktData, session: Session = Depends(get_db)):
 
+    categories = []
+    for kategorie in prod_data.kategorie:
+        category = session.query(KategorieORM).get(kategorie)
+        if category is not None:
+            categories.append(category)
+
+    product = ProduktORM(
+        nazev=prod_data.nazev,
+        cena=prod_data.cena,
+    )
+    product.kategorie = categories
+
+    session.add(product)
+    session.commit()
+
+    return {"res": ProduktDB.from_orm(product)}
+
+
+@app.post("/order")
+def create_order(obj_data: ObjednavkaData, session: Session = Depends(get_db)):
     cena = 0
     produkty = []
-    for produkt in data.produkty:
+    for produkt in obj_data.data:
         produkt_db = session.query(ProduktORM).get(produkt.id)
+
         if produkt_db is None:
-            res.status_code = status.HTTP_404_NOT_FOUND
             return {"error": "Neznámý produkt"}
-        produkty.append(produkt_db)
+
+        produkty.append((produkt_db, produkt.pocet))
         cena += produkt_db.cena * produkt.pocet
 
     objednavka = ObjednavkaORM(cena=cena)
-    objednavka.produkty = produkty
-
     session.add(objednavka)
     session.commit()
+    for produkt, pocet in produkty:
+        obsah = ObsahObjednavky(
+            objednavka_id=objednavka.id, produkt_id=produkt.id, pocet=pocet
+        )
+        session.add(obsah)
 
-    return {"res": {"id": objednavka.id, "price": cena}}
+    session.commit()
+    return {"res": ObjednavkaDB.from_orm(objednavka)}

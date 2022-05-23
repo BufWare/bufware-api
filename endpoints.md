@@ -15,12 +15,40 @@ Returns:
     ]
 }
 ```
+
+### `HTTP POST /product`
+
+Data:
+
+```json
+{
+  "data": {
+    "nazev": "Kofola 0,5L",
+    "cena": 27.5,
+    "kategorie": [1, 15, 45]
+  }
+}
+```
+
+Returns:
+
+```json
+{
+  "res": {
+    "id": 1,
+    "nazev": "Kofola 0,5L",
+    "cena": 27.5
+  }
+}
+```
+
 ### `HTTP POST /order`
 
 Data:
+
 ```json
 {
-    "data":[
+    "data": [
         {
             "id":1,
             "pocet":5
@@ -31,14 +59,16 @@ Data:
 ```
 
 Returns:
+
 ```json
 {
-    "res": {
-        "id": 1,
-        "price": 54.95
-    }
+  "res": {
+    "id": 1,
+    "cena": 54.95
+  }
 }
 ```
+
 ### `HTTP GET /menu`
 
 URL Params:
