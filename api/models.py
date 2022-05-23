@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import List
 
@@ -13,7 +14,7 @@ class Stav(Enum):
 
 class ObjednavkaBase(BaseModel):
     cena: float
-    timestamp: int
+    timestamp: datetime
     stav: Stav
 
 
@@ -30,13 +31,12 @@ class ProduktObsah(BaseModel):
 
 
 class ObjednavkaData(BaseModel):
-    produkty: List[ProduktObsah]
+    data: List[ProduktObsah]
 
 
 class ProduktBase(BaseModel):
     nazev: str
     cena: float
-    skryty: bool
 
 
 class ProduktDB(ProduktBase):
@@ -44,6 +44,11 @@ class ProduktDB(ProduktBase):
         orm_mode = True
 
     id: int
+    skryty: bool
+
+
+class ProduktData(ProduktBase):
+    kategorie: List[int]
 
 
 class KategorieBase(BaseModel):

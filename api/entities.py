@@ -9,17 +9,23 @@ from api.models import Stav
 kategorie_produkt = sa.Table(
     "kategorie_produkt",
     Base.metadata,
-    sa.Column("produkt_id", sa.ForeignKey("produkt.id")),
-    sa.Column("kategorie_id", sa.ForeignKey("kategorie.id")),
+    sa.Column("produkt_id", sa.ForeignKey("produkt.id"), primary_key=True),
+    sa.Column("kategorie_id", sa.ForeignKey("kategorie.id"), primary_key=True),
 )
 
-obsah_objednavky = sa.Table(
-    "obsah_objednavky",
-    Base.metadata,
-    sa.Column("objednavka_id", sa.ForeignKey("objednavka.id")),
-    sa.Column("produkt_id", sa.ForeignKey("produkt.id")),
-    sa.Column("pocet", sa.Integer),
-)
+
+class ObsahObjednavky(Base):
+    __tablename__ = "obsah_objednavky"
+    objednavka_id = sa.Column(
+        "objednavka_id", sa.ForeignKey("objednavka.id"), primary_key=True
+    )
+    produkt_id = sa.Column(
+        "produkt_id",
+        sa.ForeignKey("produkt.id"),
+        primary_key=True,
+    )
+    pocet = sa.Column("pocet", sa.Integer)
+    objednavka = relationship("ObjednavkaORM", back_populates="produkty")
 
 
 class ObjednavkaORM(Base):
@@ -28,7 +34,7 @@ class ObjednavkaORM(Base):
     timestamp = sa.Column("timestamp", sa.TIMESTAMP, default=datetime.now())
     stav = sa.Column("stav", sa.Enum(Stav), default=Stav.OBJEDNANO)
     cena = sa.Column("cena", sa.Float)
-    produkty = relationship("ProduktORM", secondary=obsah_objednavky)
+    produkty = relationship("ObsahObjednavky", back_populates="objednavka")
 
 
 class ProduktORM(Base):
@@ -38,7 +44,9 @@ class ProduktORM(Base):
     cena = sa.Column("cena", sa.Float)
     skryty = sa.Column("skryty", sa.Boolean, default=False)
     kategorie = relationship(
-        "KategorieORM", secondary=kategorie_produkt, back_populates="produkty"
+        "KategorieORM",
+        secondary="kategorie_produkt",
+        back_populates="produkty",
     )
 
 
@@ -47,5 +55,7 @@ class KategorieORM(Base):
     id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
     nazev = sa.Column("nazev", sa.String)
     produkty = relationship(
-        "ProduktORM", secondary=kategorie_produkt, back_populates="kategorie"
+        "ProduktORM",
+        secondary="kategorie_produkt",
+        back_populates="kategorie",
     )
