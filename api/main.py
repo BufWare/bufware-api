@@ -27,6 +27,12 @@ def overview(session: Session = Depends(get_db)):
     return orders
 
 
+@app.get("/menu")
+def get_menu(session: Session = Depends(get_db)):
+    products = session.query(entities.ProduktORM).all()
+    return products
+
+
 @app.post("/product")
 def create_product(prod_data: ProduktData, session: Session = Depends(get_db)):
 
