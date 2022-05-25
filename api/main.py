@@ -55,8 +55,7 @@ def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
             categories.append(category)
 
     product = ProduktORM(
-        nazev=prod_data.nazev,
-        cena=prod_data.cena,
+        nazev=prod_data.nazev, cena=prod_data.cena, popis=prod_data.popis
     )
     product.kategorie = categories
 

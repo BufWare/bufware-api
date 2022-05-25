@@ -37,6 +37,7 @@ class ObjednavkaData(BaseModel):
 class ProduktBase(BaseModel):
     nazev: str
     cena: float
+    popis: str
 
 
 class ProduktDB(ProduktBase):

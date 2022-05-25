@@ -45,6 +45,7 @@ class ProduktORM(Base):
     id = sa.Column("id", sa.Integer, primary_key=True, autoincrement=True)
     nazev = sa.Column("nazev", sa.String)
     cena = sa.Column("cena", sa.Float)
+    popis = sa.Column("popis", sa.String)
     skryty = sa.Column("skryty", sa.Boolean, default=False)
     kategorie = relationship(
         "KategorieORM",
