@@ -10,6 +10,7 @@ from api.entities import (
 from api.database import SessionLocal
 from api.models import (
     KategorieData,
+    KategorieDB,
     ObjednavkaData,
     ObjednavkaDB,
     ProduktData,
@@ -67,14 +68,17 @@ def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
 
 @app.post("/category")
 def create_category(cat_data: KategorieData, s: Session = Depends(get_db)):
-    pass
+    kategorie = KategorieORM(nazev=cat_data.nazev)
+    s.add(kategorie)
+    s.commit()
+    return {"res": KategorieDB.from_orm(kategorie)}
 
 
 @app.post("/order")
 def create_order(obj_data: ObjednavkaData, s: Session = Depends(get_db)):
     cena = 0
     produkty = []
-    for produkt in obj_data.data:
+    for produkt in obj_data.produkty:
         produkt_db = s.query(ProduktORM).get(produkt.id)
 
         if produkt_db is None:
