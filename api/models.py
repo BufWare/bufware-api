@@ -31,7 +31,7 @@ class ProduktObsah(BaseModel):
 
 
 class ObjednavkaData(BaseModel):
-    data: List[ProduktObsah]
+    produkty: List[ProduktObsah]
 
 
 class ProduktBase(BaseModel):
@@ -60,3 +60,7 @@ class KategorieDB(KategorieBase):
         orm_mode = True
 
     id: int
+
+
+class KategorieData(KategorieBase):
+    pass
