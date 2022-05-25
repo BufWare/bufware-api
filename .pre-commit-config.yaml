@@ -21,7 +21,3 @@ repos:
             "flake8-mutable==1.2.0",
             "pep8-naming==0.11.1",
         ]
--   repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-    -   id: isort
