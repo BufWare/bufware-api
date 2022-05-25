@@ -1,9 +1,20 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
-from api import entities
+from api.entities import (
+    ObjednavkaORM,
+    ProduktORM,
+    KategorieORM,
+    ObsahObjednavky,
+)
 from api.database import SessionLocal
-from api.models import ObjednavkaData, ObjednavkaDB, ProduktData, ProduktDB
+from api.models import (
+    KategorieData,
+    ObjednavkaData,
+    ObjednavkaDB,
+    ProduktData,
+    ProduktDB,
+)
 
 app = FastAPI()
 
@@ -23,13 +34,13 @@ def get_home():
 
 @app.get("/overview")
 def overview(s: Session = Depends(get_db)):
-    orders = s.query(entities.ObjednavkaORM).all()
+    orders = s.query(ObjednavkaORM).all()
     return orders
 
 
 @app.get("/menu")
 def get_menu(s: Session = Depends(get_db)):
-    products = s.query(entities.ProduktORM).all()
+    products = s.query(ProduktORM).all()
     return products
 
 
@@ -38,11 +49,11 @@ def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
 
     categories = []
     for kategorie in prod_data.kategorie:
-        category = s.query(entities.KategorieORM).get(kategorie)
+        category = s.query(KategorieORM).get(kategorie)
         if category is not None:
             categories.append(category)
 
-    product = entities.ProduktORM(
+    product = ProduktORM(
         nazev=prod_data.nazev,
         cena=prod_data.cena,
     )
@@ -54,12 +65,17 @@ def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
     return {"res": ProduktDB.from_orm(product)}
 
 
+@app.post("/category")
+def create_category(cat_data: KategorieData, s: Session = Depends(get_db)):
+    pass
+
+
 @app.post("/order")
 def create_order(obj_data: ObjednavkaData, s: Session = Depends(get_db)):
     cena = 0
     produkty = []
     for produkt in obj_data.data:
-        produkt_db = s.query(entities.ProduktORM).get(produkt.id)
+        produkt_db = s.query(ProduktORM).get(produkt.id)
 
         if produkt_db is None:
             return {"error": "Neznámý produkt"}
@@ -67,11 +83,11 @@ def create_order(obj_data: ObjednavkaData, s: Session = Depends(get_db)):
         produkty.append((produkt_db, produkt.pocet))
         cena += produkt_db.cena * produkt.pocet
 
-    objednavka = entities.ObjednavkaORM(cena=cena)
+    objednavka = ObjednavkaORM(cena=cena)
     s.add(objednavka)
     s.commit()
     for produkt, pocet in produkty:
-        obsah = entities.ObsahObjednavky(
+        obsah = ObsahObjednavky(
             objednavka_id=objednavka.id, produkt_id=produkt.id, pocet=pocet
         )
         s.add(obsah)
