@@ -13,6 +13,7 @@ from api.models import (
     KategorieDB,
     ObjednavkaData,
     ObjednavkaDB,
+    ObjednavkaState,
     ProduktData,
     ProduktDB,
 )
@@ -35,7 +36,7 @@ def get_home():
 
 @app.get("/overview")
 def overview(s: Session = Depends(get_db)):
-    orders = s.query(ObjednavkaORM).all()
+    orders = s.query(ObjednavkaORM.id, ObjednavkaORM.stav).all()
     return orders
 
 
@@ -71,6 +72,17 @@ def create_category(cat_data: KategorieData, s: Session = Depends(get_db)):
     s.add(kategorie)
     s.commit()
     return {"res": KategorieDB.from_orm(kategorie)}
+
+
+@app.post("/state")
+def update_state(obj_state: ObjednavkaState, s: Session = Depends(get_db)):
+    order = s.query(ObjednavkaORM).get(obj_state.id)
+    if order is None:
+        return {"error": "Objednavka nenalezena"}
+    order.stav = obj_state.stav
+    s.add(order)
+    s.commit()
+    return {"message": "Uspech"}
 
 
 @app.post("/order")

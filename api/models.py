@@ -34,6 +34,11 @@ class ObjednavkaData(BaseModel):
     produkty: List[ProduktObsah]
 
 
+class ObjednavkaState(BaseModel):
+    id: int
+    stav: Stav
+
+
 class ProduktBase(BaseModel):
     nazev: str
     cena: float

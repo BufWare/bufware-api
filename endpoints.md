@@ -22,11 +22,10 @@ Data:
 
 ```json
 {
-  "data": {
-    "nazev": "Kofola 0,5L",
-    "cena": 27.5,
-    "kategorie": [1, 15, 45]
-  }
+  "nazev": "Kofola 0,5L",
+  "cena": 27.5,
+  "popis": "Dobrý sladký nápoj",
+  "kategorie": [1, 15, 45]
 }
 ```
 
@@ -37,7 +36,9 @@ Returns:
   "res": {
     "id": 1,
     "nazev": "Kofola 0,5L",
-    "cena": 27.5
+    "cena": 27.5,
+    "popis": "Dobrý sladký nápoj",
+    "skryty": false
   }
 }
 ```
@@ -48,7 +49,7 @@ Data:
 
 ```json
 {
-    "data": [
+    "produkty": [
         {
             "id":1,
             "pocet":5
@@ -64,16 +65,14 @@ Returns:
 {
   "res": {
     "id": 1,
-    "cena": 54.95
+    "cena": 54.95,
+    "stav": 0,
+    "timestamp": ...
   }
 }
 ```
 
 ### `HTTP GET /menu`
-
-URL Params:
-
-- cat: ?int = filter category
 
 Returns:
 
@@ -83,6 +82,9 @@ Returns:
         {
             "nazev": "Kofola",
             "cena": 0,
+            "popis": "Dobrý sladký nápoj",
+            "skryty": false,
+            "id": 1,
             "kategorie": [
                 {
                     "id": 0,
@@ -94,3 +96,36 @@ Returns:
     ]
 }
 ```
+
+### `HTTP POST /category`
+
+
+Data
+
+```json
+{
+  "nazev": "Sladké"
+}
+```
+
+Returns
+```json
+{
+  "res": {
+    "id": 1,
+    "nazev": "Sladké"
+  }
+}
+```
+
+### `HTTP POST /state`
+
+Data:
+```json
+{
+  "objednavka": 1,
+  "stav": 2
+}
+```
+
+Returns: nothing
