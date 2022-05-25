@@ -22,23 +22,23 @@ def get_home():
 
 
 @app.get("/overview")
-def overview(session: Session = Depends(get_db)):
-    orders = session.query(entities.ObjednavkaORM).all()
+def overview(s: Session = Depends(get_db)):
+    orders = s.query(entities.ObjednavkaORM).all()
     return orders
 
 
 @app.get("/menu")
-def get_menu(session: Session = Depends(get_db)):
-    products = session.query(entities.ProduktORM).all()
+def get_menu(s: Session = Depends(get_db)):
+    products = s.query(entities.ProduktORM).all()
     return products
 
 
 @app.post("/product")
-def create_product(prod_data: ProduktData, session: Session = Depends(get_db)):
+def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
 
     categories = []
     for kategorie in prod_data.kategorie:
-        category = session.query(entities.KategorieORM).get(kategorie)
+        category = s.query(entities.KategorieORM).get(kategorie)
         if category is not None:
             categories.append(category)
 
@@ -48,18 +48,18 @@ def create_product(prod_data: ProduktData, session: Session = Depends(get_db)):
     )
     product.kategorie = categories
 
-    session.add(product)
-    session.commit()
+    s.add(product)
+    s.commit()
 
     return {"res": ProduktDB.from_orm(product)}
 
 
 @app.post("/order")
-def create_order(obj_data: ObjednavkaData, session: Session = Depends(get_db)):
+def create_order(obj_data: ObjednavkaData, s: Session = Depends(get_db)):
     cena = 0
     produkty = []
     for produkt in obj_data.data:
-        produkt_db = session.query(entities.ProduktORM).get(produkt.id)
+        produkt_db = s.query(entities.ProduktORM).get(produkt.id)
 
         if produkt_db is None:
             return {"error": "Neznámý produkt"}
@@ -68,13 +68,13 @@ def create_order(obj_data: ObjednavkaData, session: Session = Depends(get_db)):
         cena += produkt_db.cena * produkt.pocet
 
     objednavka = entities.ObjednavkaORM(cena=cena)
-    session.add(objednavka)
-    session.commit()
+    s.add(objednavka)
+    s.commit()
     for produkt, pocet in produkty:
         obsah = entities.ObsahObjednavky(
             objednavka_id=objednavka.id, produkt_id=produkt.id, pocet=pocet
         )
-        session.add(obsah)
+        s.add(obsah)
 
-    session.commit()
+    s.commit()
     return {"res": ObjednavkaDB.from_orm(objednavka)}
