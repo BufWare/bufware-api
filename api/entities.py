@@ -47,6 +47,7 @@ class ProduktORM(Base):
         "KategorieORM",
         secondary="kategorie_produkt",
         back_populates="produkty",
+        lazy="subquery",
     )
 
 
