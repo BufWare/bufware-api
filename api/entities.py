@@ -25,8 +25,6 @@ class ObsahObjednavky(Base):
         primary_key=True,
     )
     pocet = sa.Column("pocet", sa.Integer)
-    objednavka = relationship("ObjednavkaORM", back_populates="produkty")
-    produkt = relationship("ProduktORM", lazy="subquery")
 
 
 class ObjednavkaORM(Base):
@@ -35,9 +33,7 @@ class ObjednavkaORM(Base):
     timestamp = sa.Column("timestamp", sa.TIMESTAMP, default=datetime.now())
     stav = sa.Column("stav", sa.Enum(Stav), default=Stav.OBJEDNANO)
     cena = sa.Column("cena", sa.Float)
-    produkty = relationship(
-        "ObsahObjednavky", back_populates="objednavka", lazy="subquery"
-    )
+    produkty = relationship("ProduktORM", secondary="obsah_objednavky", lazy="subquery")
 
 
 class ProduktORM(Base):

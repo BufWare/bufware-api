@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from api.entities import (
@@ -19,6 +20,13 @@ from api.models import (
 )
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_db():
@@ -37,6 +45,12 @@ def get_home():
 @app.get("/overview")
 def overview(s: Session = Depends(get_db)):
     orders = s.query(ObjednavkaORM.id, ObjednavkaORM.stav).all()
+    return orders
+
+
+@app.get("/orders")
+def get_orders(s: Session = Depends(get_db)):
+    orders = s.query(ObjednavkaORM).all()
     return orders
 
 
@@ -63,7 +77,7 @@ def create_product(prod_data: ProduktData, s: Session = Depends(get_db)):
     s.add(product)
     s.commit()
 
-    return {"res": ProduktDB.from_orm(product)}
+    return ProduktDB.from_orm(product)
 
 
 @app.post("/category")
@@ -71,7 +85,7 @@ def create_category(cat_data: KategorieData, s: Session = Depends(get_db)):
     kategorie = KategorieORM(nazev=cat_data.nazev)
     s.add(kategorie)
     s.commit()
-    return {"res": KategorieDB.from_orm(kategorie)}
+    return KategorieDB.from_orm(kategorie)
 
 
 @app.post("/state")
@@ -108,4 +122,4 @@ def create_order(obj_data: ObjednavkaData, s: Session = Depends(get_db)):
         s.add(obsah)
 
     s.commit()
-    return {"res": ObjednavkaDB.from_orm(objednavka)}
+    return ObjednavkaDB.from_orm(objednavka)
